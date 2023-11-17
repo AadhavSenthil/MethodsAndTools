@@ -1,39 +1,46 @@
 import sqlite3
 
-user = sqlite3.connect('Users.db')
-
-cursor = user.cursor()
 
 class User:
-    def User():
-        UserID = " "
-        loggedIn = False
+    def _init_(self, databaseName, tableName):
+        self.loggedIn = False
+        self.userID = " "
+        self.database = databaseName
+        self.tableName = tableName
 
 
-    #def User(databaseName, tableName):
         
+    def login(self):
+        user = sqlite3.connect(self.database)
+        cursor = user.cursor()
 
-        
-    def login():
-        UserID = input("UserID:")
+        self.userID = input("UserID:")
         password = input("Password:")
-        cursor.execute('SELECT Users.Password, Users.UserID FROM Users WHERE UserID=? AND Password=?', (UserID,password))
+        cursor.execute('SELECT Users.Password, Users.UserID FROM ? WHERE UserID=? AND Password=?', (self.tableName,self.userID,password))
         row = cursor.fetchone()
         if row:
             print("Login Success")
-            loggedIn =True
+            self.loggedIn =True
             return True
         else:
             print("Login Failed")
-            loggedIn = False
+            self.loggedIn = False
             return False
 
-    def creatAccount():
+    def logout(self):
+        user = sqlite3.connect(self.database)
+        cursor = user.cursor()
         
+        self.userID = " "
+        self.loggedIn = False
+        return False
+
+    def viewAccountInformation(self):
+        print()
 
 
 
+def main():
+    user1 =User('Users.db', 'Users')
 
-user = User()
-
-user.login()
+    user1.login()
