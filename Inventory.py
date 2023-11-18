@@ -19,8 +19,6 @@ class Inventory:
             "ReleaseDate" TEXT NOT NULL,
             PRIMARY KEY("ISBN")
         )""")
-        connection.commit()
-        connection.close()
 
     def view_inventory(self):
         # Establish connection
@@ -37,7 +35,6 @@ class Inventory:
         else:
             for row in rows:
                 print(row)
-        connection.close()
 
     def search_inventory(self):
         title = input("Please enter a book to search: ")
@@ -52,6 +49,12 @@ class Inventory:
             print("Matching books: ")
             for row in rows:
                 print(row)
+    
+    def decreaseStock(self, ISBN):
+        connection = sqlite3.connect(self.databaseName)
+        cursor = connection.cursor()
+        cursor.execute(f"UPDATE INVENTORY SET Stock=Stock-1 WHERE ISBN={ISBN} ")
+        connection.commit()
 
 # Create an instance of the Inventory class using the __init__ method
 inventory_instance = Inventory("inventory.db", "Inventory")
@@ -60,5 +63,9 @@ inventory_instance = Inventory("inventory.db", "Inventory")
 inventory_instance.view_inventory()
 
 inventory_instance.search_inventory()
+
+inventory_instance.decreaseStock("123456789")
+
+inventory_instance.view_inventory()
 
 
