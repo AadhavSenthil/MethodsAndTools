@@ -10,18 +10,22 @@ class Cart:
         cursor = connection.cursor()
 
         # Retrieve cart items for the given user
-        cursor.execute(f"SELECT ISBN FROM {self.tableName} WHERE UserID = ?", (userID,))
+        cursor.execute(f"SELECT ISBN, Quantity FROM {self.tableName} WHERE UserID = ?", (userID,))
         cart_items = cursor.fetchall()
 
         if not cart_items:
             print("Cart is empty.")
         else:
             print("Books in Cart:")
-            for isbn in cart_items:
-                book_info = inventoryDatabase.getBookInfoByISBN(isbn[0])
-                print(f"ISBN: {isbn[0]}, Title: {book_info['Title']}, Stock: {book_info['Stock']}")
+            for isbn, quantity in cart_items:
+                # Use the updated method for getting book information
+                book_info = inventoryDatabase.get_book_info_by_isbn(isbn)
+                if book_info:
+                    print(f"ISBN: {isbn}, Title: {book_info['Title']}, Quantity: {quantity}")
+                else:
+                    print(f"ISBN: {isbn} (Book information not found in inventory)")
 
-    def add_to_cart(self, userID, ISBN):
+    def add_to_cart(self, userID, ISBN, inventory_instance):
         connection = sqlite3.connect(self.databaseName)
         cursor = connection.cursor()
 
@@ -30,12 +34,19 @@ class Cart:
         existing_item = cursor.fetchone()
 
         if existing_item:
-            print("Item is already in the cart.")
-        else:
-            # Add the item to the cart
-            cursor.execute(f"INSERT INTO {self.tableName} (UserID, ISBN) VALUES (?, ?)", (userID, ISBN))
+            # If the item already exists, update the quantity
+            cursor.execute(f"UPDATE {self.tableName} SET Quantity = Quantity + 1 WHERE UserID = ? AND ISBN = ?", (userID, ISBN))
             connection.commit()
-            print(f"Book with ISBN: {ISBN} added to the cart!")
+            print(f"Book with ISBN: {ISBN} quantity updated in the cart.")
+        else:
+            # Check if the ISBN exists in the inventory
+            if inventory_instance.get_book_info_by_isbn(ISBN):
+                # Add the item to the cart with a default quantity (or adjust as needed)
+                cursor.execute(f"INSERT INTO {self.tableName} (UserID, ISBN, Quantity) VALUES (?, ?, 1)", (userID, ISBN))
+                connection.commit()
+                print(f"Book with ISBN: {ISBN} added to the cart!")
+            else:
+                print(f"Book with ISBN: {ISBN} does not exist in the inventory.")
 
     def remove_from_cart(self, userID, ISBN):
         connection = sqlite3.connect(self.databaseName)
@@ -50,8 +61,8 @@ class Cart:
         connection = sqlite3.connect(self.databaseName)
         cursor = connection.cursor()
 
-        # Retrieve cart items for the given user
-        cursor.execute(f"SELECT ISBN FROM {self.tableName} WHERE UserID = ?", (userID,))
+        # Retrieve cart items for the given user with quantity
+        cursor.execute(f"SELECT ISBN, Quantity FROM {self.tableName} WHERE UserID = ?", (userID,))
         cart_items = cursor.fetchall()
 
         if not cart_items:
@@ -60,10 +71,13 @@ class Cart:
             total_price = 0
 
             # Calculate total price and update inventory
-            for isbn in cart_items:
-                book_info = inventoryDatabase.get_book_info_by_isbn(isbn[0])
-                total_price += book_info['Price']
-                inventoryDatabase.decrease_stock(isbn[0])
+            for isbn, quantity in cart_items:
+                book_info = inventoryDatabase.get_book_info_by_isbn(isbn)
+                if book_info:
+                    total_price += book_info['Price'] * quantity
+                    inventoryDatabase.decreaseStock(isbn, quantity)  # Pass quantity as a third argument
+                else:
+                    print(f"ISBN: {isbn} (Book information not found in inventory)")
 
             # Clear the cart
             cursor.execute(f"DELETE FROM {self.tableName} WHERE UserID = ?", (userID,))
