@@ -28,11 +28,7 @@ class User:
             return False
 
     def logout(self):
-        user = sqlite3.connect(self.database)
-        cursor = user.cursor()
-        
         if self.loggedIn == True:
-            cursor.execute(f"UPDATE {self.tableName} SET UserID = ? WHERE UserID = {self.userID} ")
             self.userID = " "
             self.loggedIn = False
 
@@ -42,8 +38,8 @@ class User:
         user = sqlite3.connect(self.database)
         cursor = user.cursor()
         if self.loggedIn == True:
-            cursor.execute(f'SELECT * FROM {self.tableName} WHERE UserID=?', (self.userID))
-            row = cursor.fetchone()
+            cursor.execute(f'SELECT * FROM {self.tableName} WHERE UserID=?', (self.userID,))
+            row = cursor.fetchall()
             print("Account Info:")
             if not row:
                 print("No matching User.")
@@ -65,8 +61,8 @@ class User:
         address = input("Address: ")
         city = input("City: ")
         state = input("State: ")
-        zip = ("Zip: ")
-        payment = ("Payment: ")
+        zip = input("Zip: ")
+        payment = input("Payment: ")
 
         cursor.execute(f"INSERT INTO {self.tableName} (UserID, Email, Password, FirstName, LastName, Address, City, State, Zip, Payment) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.userID, email, password, firstName, lastName, address, city, state, zip, payment))
         user.commit()
@@ -81,11 +77,3 @@ class User:
 
 
 
-
-
-def main():
-    user1 =User('Users.db', 'Users')
-    
-    user1.createAccount()
-
-    user1.login()
