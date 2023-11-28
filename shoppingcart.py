@@ -19,7 +19,10 @@ class Cart:
             print("Books in Cart:")
             for isbn in cart_items:
                 book_info = inventoryDatabase.getBookInfoByISBN(isbn[0])
-                print(f"ISBN: {isbn[0]}, Title: {book_info['Title']}, Stock: {book_info['Stock']}")
+                if book_info:
+                    print(f"ISBN: {isbn[0]}, Title: {book_info['Title']}, Stock: {book_info['Stock']}")
+                else:
+                    print(f"ISBN: {isbn[0]} (Book information not found in inventory)")
 
     def add_to_cart(self, userID, ISBN):
         connection = sqlite3.connect(self.databaseName)
@@ -62,8 +65,11 @@ class Cart:
             # Calculate total price and update inventory
             for isbn in cart_items:
                 book_info = inventoryDatabase.get_book_info_by_isbn(isbn[0])
-                total_price += book_info['Price']
-                inventoryDatabase.decrease_stock(isbn[0])
+                if book_info:
+                    total_price += book_info['Price']
+                    inventoryDatabase.decreaseStock(isbn[0])
+                else:
+                    print(f"ISBN: {isbn[0]} (Book information not found in inventory)")
 
             # Clear the cart
             cursor.execute(f"DELETE FROM {self.tableName} WHERE UserID = ?", (userID,))

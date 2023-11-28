@@ -19,6 +19,7 @@ class Inventory:
             "ReleaseDate" TEXT NOT NULL,
             PRIMARY KEY("ISBN")
         )""")
+        connection.commit()
 
     def view_inventory(self):
         # Establish connection
