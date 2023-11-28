@@ -19,6 +19,7 @@ class Inventory:
             "ReleaseDate" TEXT NOT NULL,
             PRIMARY KEY("ISBN")
         )""")
+        connection.commit()
 
     def view_inventory(self):
         # Establish connection
@@ -55,6 +56,10 @@ class Inventory:
         cursor = connection.cursor()
         cursor.execute(f"UPDATE INVENTORY SET Stock=Stock-1 WHERE ISBN={ISBN} ")
         connection.commit()
+    
+    def getDatabase(self):
+        return self.databaseName
+
 
 # Create an instance of the Inventory class using the __init__ method
 inventory_instance = Inventory("inventory.db", "Inventory")
@@ -67,5 +72,6 @@ inventory_instance.search_inventory()
 inventory_instance.decreaseStock("123456789")
 
 inventory_instance.view_inventory()
+
 
 
