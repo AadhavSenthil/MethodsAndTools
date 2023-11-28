@@ -60,9 +60,18 @@ class Inventory:
     def getDatabase(self):
         return self.databaseName
 
+
 # Create an instance of the Inventory class using the __init__ method
 inventory_instance = Inventory("inventory.db", "Inventory")
 
+# View the inventory
+inventory_instance.view_inventory()
+
+inventory_instance.search_inventory()
+
+inventory_instance.decreaseStock("123456789")
+
+inventory_instance.view_inventory()
 
 
 
