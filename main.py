@@ -1,23 +1,27 @@
 from Inventory import Inventory
+from users import User
+from shoppingcart import Cart
 
 def main():
     inventory_instance = Inventory("inventory.db", "Inventory")
     # put your instances here; replace all ___ with instance
+    user_instance = User("Users (1).db", "Users")
+    cart_instance = Cart("ShoppingCart.db","Cart")
 
     while True:
         # user's getter for determining if user is logged in
-        if getLoggedIn() == False:
+        if user_instance.getLoggedIn() == False:
             print("\n1. Login")
             print("\n2. Create Account")
             print("\n3. Logout")
 
             choice = input("\nEnter your choice: ")
             if (choice == "1"):
-                ___.login()
+                user_instance.login()
             elif (choice == "2"):
-                ___.createAccount()
+                user_instance.createAccount()
             elif (choice == "3"):
-                ___.logout()
+                user_instance.logout()
             else:
                 print("\nInvalid choice. Please try again.")
         else:
@@ -28,13 +32,13 @@ def main():
 
             choice = input("\nEnter your choice: ")
             if (choice == "1"):
-                ___.logout()
+                user_instance.logout()
             elif (choice == "2"):
-                ___.viewAccountInformation()
+                user_instance.viewAccountInformation()
             elif (choice == "3"):
                 inventory_menu(inventory_instance)
             elif (choice == "4"):
-                cart_menu(cart_instance)
+                cart_menu(cart_instance, user_instance, inventory_instance)
             else:
                 print("\nInvalid choice. Please try again.")
 
@@ -56,7 +60,7 @@ def inventory_menu(inventory_instance):
             print("\nInvalid choice. Please try again.")
 
 # fix parameters or function/instance name to match cart 
-def cart_menu(cart_instance):
+def cart_menu(cart_instance, user_instance, inventory_instance):
     while True:
         print("\n1. Go Back")
         print("\n2. View Cart")
@@ -68,12 +72,14 @@ def cart_menu(cart_instance):
         if choice == "1":
             break
         elif choice == "2":
-            cart_instance.view_cart()
+            cart_instance.view_cart(user_instance.getUserID(),inventory_instance.getDatabase())
         elif choice == "3":
-            cart_instance.addToCart()
+            cart_instance.add_to_cart(user_instance.getUserID(),)
         elif choice == "4":
-            cart_instance.removeFromCart()
+            cart_instance.remove_from_cart(user_instance.getUserID(),)
         elif choice == "5":
-            cart_instance.checkOut()
+            cart_instance.checkOut(user_instance.getUserID(),inventory_instance.getDatabase())
         else:
             print("\nInvalid choice. Please try again.")
+
+main()
