@@ -51,27 +51,36 @@ class Inventory:
             for row in rows:
                 print(row)
     
-    def decreaseStock(self, ISBN):
+    def decreaseStock(self, ISBN, quantity):
         connection = sqlite3.connect(self.databaseName)
         cursor = connection.cursor()
-        cursor.execute(f"UPDATE INVENTORY SET Stock=Stock-1 WHERE ISBN={ISBN} ")
+        cursor.execute(f"UPDATE {self.tableName} SET Stock=Stock-? WHERE ISBN=?", (quantity, ISBN))
         connection.commit()
     
     def getDatabase(self):
         return self.databaseName
+    
+    def get_book_info_by_isbn(self, ISBN):
+        connection = sqlite3.connect(self.databaseName)
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT * FROM {self.tableName} WHERE ISBN = ?", (ISBN,))
+        book_info = cursor.fetchone()
+        connection.close()
+
+        if book_info:
+            return {
+                "Title": book_info[0],
+                "ISBN": book_info[1],
+                "Stock": book_info[2],
+                "Pages": book_info[3],
+                "Genre": book_info[4],
+                "ReleaseDate": book_info[5],
+                "Price": book_info[6], 
+            }
+        else:
+            return None
 
 
-# Create an instance of the Inventory class using the __init__ method
-inventory_instance = Inventory("inventory.db", "Inventory")
-
-# View the inventory
-inventory_instance.view_inventory()
-
-inventory_instance.search_inventory()
-
-inventory_instance.decreaseStock("123456789")
-
-inventory_instance.view_inventory()
 
 
 

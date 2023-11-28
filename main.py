@@ -72,12 +72,13 @@ def cart_menu(cart_instance, user_instance, inventory_instance):
         if choice == "1":
             break
         elif choice == "2":
-            cart_instance.view_cart(user_instance.getUserID(), inventory_instance.getDatabase())
+            cart_instance.view_cart(user_instance.getUserID(), inventory_instance)
         elif choice == "3":
             isbn_to_add = input("Enter the ISBN of the book to add to the cart: ")
-            cart_instance.add_to_cart(user_instance.getUserID(), isbn_to_add)
+            cart_instance.add_to_cart(user_instance.getUserID(), isbn_to_add, inventory_instance)
         elif choice == "4":
-            cart_instance.remove_from_cart(user_instance.getUserID())
+            isbn_to_remove = input('Enter the ISBN of the book to remove from the cart: ')
+            cart_instance.remove_from_cart(user_instance.getUserID(), isbn_to_remove)
         elif choice == "5":
             cart_instance.checkout(user_instance.getUserID(), inventory_instance)
         else:
